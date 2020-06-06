@@ -22,13 +22,14 @@ export const Description = styled.Text`
   font-size: 18px;
   font-family: 'Roboto-Regular';
   color: #64002a;
+  text-align: center;
 `;
 
 export const ScanButton = styled.TouchableOpacity`
   background: #64002a;
   width: 100px;
-  height: 100px;
-  border-radius: 50px;
+  height: 50px;
+  border-radius: 8px;
   margin-top: 20px;
 
   align-items: center;

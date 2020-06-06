@@ -17,7 +17,7 @@ const Header = ({ children }) => {
       >
         <Icon name="chevron-left" size={30} style={{ color: '#64002a' }} />
       </BackButton>
-      <Title>Meus pedidos</Title>
+      <Title>{children}</Title>
     </Container>
   );
 };

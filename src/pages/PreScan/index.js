@@ -5,6 +5,8 @@ import Button from '../../components/Button';
 import Icon from 'react-native-vector-icons/Feather';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-community/async-storage';
+import Lottie from 'lottie-react-native';
+import qrScan from '../../assets/qr-code-scan.json';
 
 const PreScan = () => {
   const navigation = useNavigation();
@@ -29,7 +31,13 @@ const PreScan = () => {
       <Content>
         <Hello>Olá, {data.name}! :)</Hello>
       </Content>
-
+      <Lottie
+        source={qrScan}
+        style={{ marginBottom: 20 }}
+        resizeMode="contain"
+        autoSize
+        autoPlay
+      />
       <View>
         <Description>
           Para fazer um pedido bastar ler o QR Code que está sobre a mesa.

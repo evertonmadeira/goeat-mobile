@@ -11,11 +11,11 @@ const App = createStackNavigator();
 
 const AppRoutes = () => (
   <App.Navigator screenOptions={{ headerShown: false, cardStyle: '#64002a' }}>
+    {/* <App.Screen name="PreScan" component={PreScan} /> */}
     <App.Screen name="Main" component={Main} />
     <App.Screen name="Cart" component={Cart} />
     <App.Screen name="Dishes" component={Dishes} />
-    {/* <App.Screen name="PreScan" component={PreScan} />
-    <App.Screen name="Scan" component={Scan} /> */}
+    {/* <App.Screen name="Scan" component={Scan} /> */}
   </App.Navigator>
 );
 
