@@ -1,13 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { FlatList, SafeAreaView, Image, View } from 'react-native';
 import {
-  Container,
+  FlatList,
+  Image,
+  View,
+  Text,
+  TouchableOpacity,
+  Alert,
+} from 'react-native';
+import {
   Content,
-  BagButton,
   Header,
   ImageC,
   CardTitle,
   CountOptions,
+  ImageContainer,
   CardCategory,
   CardCategoryButton,
   CategoryText,
@@ -17,16 +23,33 @@ import { useNavigation } from '@react-navigation/native';
 import logoImg from '../../assets/logo.png';
 import api from '../../services/api';
 import pastaImg from '../../assets/pasta.jpg';
-import Bag from '../../components/Bag';
+import Footer from '../../components/Footer';
+import AsyncStorage from '@react-native-community/async-storage';
+import { useAuth } from '../../hooks/auth';
 
 const Main = () => {
   const [productsCategories, setProductsCategories] = useState([]);
+  const [table, setTable] = useState([]);
+  const [count, setCount] = useState([]);
   const navigation = useNavigation();
+  const { signOut } = useAuth();
+
+  useEffect(() => {
+    async function loadTable() {
+      try {
+        const data = await AsyncStorage.getItem('@GoEats:table');
+        setTable(JSON.parse(data));
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    loadTable();
+  }, []);
 
   useEffect(() => {
     async function loadProductsCategories() {
       try {
-        const response = await api.get('/product');
+        const response = await api.get('/category');
 
         const productCategory = response.data;
         setProductsCategories(productCategory);
@@ -38,27 +61,73 @@ const Main = () => {
     loadProductsCategories();
   }, []);
 
+  // useEffect(() => {
+  //   async function loadCount(category) {
+  //     try {
+  //       const response = await api.get(`/product/count/${category}`);
+
+  //       const countItem = response.data;
+  //       setCount(countItem);
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  //   }
+
+  //   loadCount();
+  // }, []);
+
+  function handleNavigateToDishes(categoria) {
+    navigation.navigate('Dishes', { categoria: categoria });
+  }
+
+  function logout() {
+    Alert.alert(
+      'Sair do GoEats',
+      'Deseja realmente sair?',
+      [
+        {
+          text: 'Cancelar',
+          onPress: () => console.log('Cancel pressed'),
+          style: 'cancel',
+        },
+        {
+          text: 'Sim',
+          onPress: () => signOut(),
+        },
+      ],
+      { cancelable: false },
+    );
+  }
+
   return (
     <Content>
       <Header>
         <Image source={logoImg} />
-        <Bag />
+        <TouchableOpacity onPress={logout}>
+          <Icon name="power" size={24} style={{ color: '#fff' }} />
+        </TouchableOpacity>
       </Header>
-
+      <Text style={{ color: '#fff', fontSize: 24, paddingLeft: 50 }}>
+        Mesa #{table}
+      </Text>
       <FlatList
         data={productsCategories}
-        keyExtractor={(item) => item.categoria}
+        keyExtractor={(item) => String(item._id)}
         ListFooterComponent={<View />}
-        ListFooterComponentStyle={{ height: 50 }}
+        ListFooterComponentStyle={{ height: 20 }}
         renderItem={({ item }) => (
           <CardCategory>
-            <ImageC source={pastaImg} />
+            <ImageContainer>
+              <ImageC source={{ uri: item.img.url }} />
+            </ImageContainer>
             <CategoryText>
-              <CardTitle>{item.categoria}</CardTitle>
-              <CountOptions>15 opções</CountOptions>
+              <CardTitle>{item.nome}</CardTitle>
+              {/* <CountOptions>10 opções</CountOptions> */}
             </CategoryText>
 
-            <CardCategoryButton onPress={() => navigation.navigate('Dishes')}>
+            <CardCategoryButton
+              onPress={() => handleNavigateToDishes(item.nome)}
+            >
               <Icon
                 name="chevron-right"
                 size={24}
@@ -68,6 +137,7 @@ const Main = () => {
           </CardCategory>
         )}
       />
+      <Footer />
     </Content>
   );
 };

@@ -18,20 +18,27 @@ const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     async function loadStorageData() {
-      const [token, nome] = await AsyncStorage.multiGet([
+      const [token, nome, table, register] = await AsyncStorage.multiGet([
         '@GoEats:token',
         '@GoEats:user',
+        '@GoEats:table',
+        '@GoEats:register',
       ]);
 
-      if (token[1] && nome[1]) {
-        setData({ token: token[1], nome: JSON.parse(nome[1]) });
+      if ((token[1] && nome[1]) || (table[1] && register[1])) {
+        setData({
+          token: token[1],
+          nome: JSON.parse(nome[1]),
+          table: table[1],
+          register: JSON.parse(register[1]),
+        });
       }
 
       setLoading(false);
     }
 
     loadStorageData();
-  }, []);
+  }, [data]);
 
   const signIn = useCallback(async ({ email, senha }) => {
     const response = await api.post('user/authenticate', {
@@ -50,14 +57,56 @@ const AuthProvider = ({ children }) => {
     setData({ token, nome });
   }, []);
 
-  const signOut = useCallback(async () => {
-    await AsyncStorage.multiRemove(['@GoEats:token', '@GoEats:user']);
+  const occupiedTable = useCallback(
+    async (table_id) => {
+      const { nome } = data;
+      const response = await api.post(`register/${nome}/${table_id}`);
 
-    setData({});
-  }, []);
+      console.log(response.data);
+      const { occupied_table, _id } = response.data;
+
+      await AsyncStorage.multiSet([
+        ['@GoEats:table', occupied_table],
+        ['@GoEats:register', JSON.stringify(_id)],
+      ]);
+
+      setData((prevData) => {
+        return { ...prevData, table: occupied_table, register_id: _id };
+      });
+    },
+    [data],
+  );
+
+  const signOut = useCallback(async () => {
+    try {
+      const { register } = data;
+
+      await api.put(`register/${register}`);
+
+      await AsyncStorage.multiRemove([
+        '@GoEats:token',
+        '@GoEats:user',
+        '@GoEats:table',
+        '@GoEats:register',
+      ]);
+
+      setData({});
+    } catch (error) {
+      console.log('Algum problema no logout:' + error);
+    }
+  }, [data]);
 
   return (
-    <AuthContext.Provider value={{ nome: data.nome, signIn, signOut, loading }}>
+    <AuthContext.Provider
+      value={{
+        nome: data.nome,
+        signIn,
+        signOut,
+        loading,
+        table: data.table,
+        occupiedTable,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

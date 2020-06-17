@@ -26,14 +26,13 @@ import {
 import logoImg from '../../assets/logo.png';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
-import api from '../../services/api';
 
 const SignIn = () => {
   const passwordInputRef = useRef(null);
   const formRef = useRef(null);
   const navigation = useNavigation();
 
-  const { signIn, user } = useAuth();
+  const { signIn } = useAuth();
 
   const handleSignIn = useCallback(
     async (data) => {

@@ -42,7 +42,7 @@ const Bag = () => {
 
   return (
     <Container onPress={() => navigation.navigate('Cart')}>
-      <Icon name="shopping-bag" size={24} style={{ color: '#fff' }} />
+      <Icon name="shopping-bag" size={24} style={{ color: '#64002a' }} />
 
       {products != 0 && (
         <Notification>

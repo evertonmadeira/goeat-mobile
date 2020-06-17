@@ -15,6 +15,8 @@ export const Title = styled.Text`
   font-family: 'Roboto-Regular';
   font-size: 22px;
   color: #64002a;
+
+  padding-left: 16px;
 `;
 
 export const BackButton = styled.TouchableOpacity`

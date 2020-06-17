@@ -4,7 +4,6 @@ import { FlatList, Image, View } from 'react-native';
 import { useCart } from '../../hooks/cart';
 import {
   Container,
-  Header,
   ImageC,
   CardTitle,
   Description,
@@ -16,20 +15,22 @@ import {
   DishText,
 } from './styles';
 import Icon from 'react-native-vector-icons/Feather';
-import Bag from '../../components/Bag';
-import { useNavigation } from '@react-navigation/native';
-import logoImg from '../../assets/logo.png';
+import Footer from '../../components/Footer';
+import Header from '../../components/Header';
+import { useRoute } from '@react-navigation/native';
 import api from '../../services/api';
 import formatValue from '../../utils/formatValue';
 
 const Dishes = () => {
   const { addToCart } = useCart();
   const [dishes, setDishes] = useState([]);
-  const navigation = useNavigation();
+  const route = useRoute();
+
+  const routeParams = route.params;
 
   useEffect(() => {
     async function loadDishes() {
-      const response = await api.get('/product');
+      const response = await api.get(`/product/${routeParams.categoria}`);
 
       const dish = response.data;
 
@@ -40,7 +41,7 @@ const Dishes = () => {
     } catch (error) {
       console.log(error);
     }
-  }, []);
+  }, [routeParams.categoria]);
 
   function handleAddToCart(item) {
     addToCart(item);
@@ -48,15 +49,12 @@ const Dishes = () => {
 
   return (
     <Container>
-      <Header>
-        <Image source={logoImg} />
-        <Bag />
-      </Header>
+      <Header>{routeParams.categoria}</Header>
 
       <DishContainer>
         <FlatList
           data={dishes}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => String(item._id)}
           horizontal
           showsHorizontalScrollIndicator={false}
           ListFooterComponent={<View />}
@@ -73,7 +71,7 @@ const Dishes = () => {
               </Description>
 
               <CardDishButton
-                testID={`add-to-cart-${item.id}`}
+                testID={`add-to-cart-${item._id}`}
                 onPress={() => handleAddToCart(item)}
               >
                 <Icon
@@ -86,6 +84,7 @@ const Dishes = () => {
           )}
         />
       </DishContainer>
+      <Footer />
     </Container>
   );
 };

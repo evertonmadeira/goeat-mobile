@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useMemo, useState } from 'react';
-import { Text, Animated } from 'react-native';
+import { Text, Animated, Alert } from 'react-native';
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
 import { useCart } from '../../hooks/cart';
 import formatValue from '../../utils/formatValue';
@@ -22,12 +22,18 @@ import {
   ItemList,
 } from './styles';
 import Icon from 'react-native-vector-icons/Feather';
+import Footer from '../../components/Footer';
 import Header from '../../components/Header';
 import Lottie from 'lottie-react-native';
 import emptyBag from '../../assets/empty-bag.json';
+import api from '../../services/api';
+import AsyncStorage from '@react-native-community/async-storage';
+import { useNavigation } from '@react-navigation/native';
 
 const Cart = () => {
   const { increment, decrement, products, removeToCart } = useCart();
+
+  const navigation = useNavigation();
 
   let offset = -182;
 
@@ -103,9 +109,38 @@ const Cart = () => {
     }
   };
 
+  const handleSubmitOrder = async () => {
+    try {
+      const data = [...products];
+      const status = 'Aberto';
+      const table = await AsyncStorage.getItem('@GoEats:table');
+
+      const order = data.map((item, i) => {
+        return {
+          quantity: item.quantity,
+          nome: item.nome,
+          preco: item.preco,
+        };
+      });
+
+      await api.post('/order', {
+        mesa: table,
+        status: status,
+        pedidos: order,
+        total: 0,
+      });
+
+      removeToCart();
+      navigation.navigate('Status');
+    } catch (error) {
+      console.log(error);
+      Alert.alert('Erro ao realizar pedido', 'Tente novamente');
+    }
+  };
+
   return (
     <>
-      <Header>Meus pedidos</Header>
+      <Header>Pedidos</Header>
       <Container>
         {products == 0 && (
           <>
@@ -116,7 +151,7 @@ const Cart = () => {
               autoSize
               autoPlay
             />
-            <Title>Sua sacola está vazia</Title>
+            <Title>Sua bag está vazia</Title>
             <Text style={{ color: '#fff', fontSize: 16 }}>
               Volte ao menu principal para fazer um pedido
             </Text>
@@ -126,7 +161,7 @@ const Cart = () => {
         {products != 0 && (
           <ItemList
             data={products}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item) => String(item.nome)}
             renderItem={({ item }) => (
               <Bag>
                 <Image source={{ uri: item.img.url }} />
@@ -191,10 +226,10 @@ const Cart = () => {
             </Content>
             <Content>
               <ActionButton isCancel onPress={handleRemove}>
-                <Icon name="trash-2" size={22} style={{ color: '#fff' }} />
+                <Icon name="x" size={22} style={{ color: '#fff' }} />
                 {/* <ContentText>Cancelar</ContentText> */}
               </ActionButton>
-              <ActionButton isCheck>
+              <ActionButton isCheck onPress={handleSubmitOrder}>
                 <Icon name="check" size={22} style={{ color: '#fff' }} />
                 {/* <ContentText>Finalizar</ContentText> */}
               </ActionButton>
@@ -202,6 +237,7 @@ const Cart = () => {
           </CardFooter>
         </PanGestureHandler>
       </Container>
+      <Footer />
     </>
   );
 };

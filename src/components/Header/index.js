@@ -10,13 +10,6 @@ const Header = ({ children }) => {
 
   return (
     <Container>
-      <BackButton
-        onPress={() => {
-          navigation.goBack();
-        }}
-      >
-        <Icon name="chevron-left" size={30} style={{ color: '#64002a' }} />
-      </BackButton>
       <Title>{children}</Title>
     </Container>
   );

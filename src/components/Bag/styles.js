@@ -2,8 +2,8 @@ import styled from 'styled-components/native';
 
 export const Container = styled.TouchableOpacity`
   background: transparent;
-  height: 50px;
-  width: 50px;
+  height: 100%;
+  width: 130px;
 
   justify-content: center;
   align-items: center;
@@ -20,5 +20,5 @@ export const Notification = styled.View`
 
   position: absolute;
   top: 8px;
-  right: 8px;
+  right: 48px;
 `;

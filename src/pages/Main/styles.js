@@ -5,7 +5,7 @@ export const Header = styled.View`
   justify-content: space-between;
 
   flex-direction: row;
-  padding: 10px 15px 0 18px;
+  padding: 18px;
 `;
 
 export const Content = styled.View`
@@ -40,14 +40,23 @@ export const CardCategory = styled.View`
   border-radius: 6px;
 `;
 
-export const ImageC = styled.Image`
+export const ImageContainer = styled.View`
   width: 80px;
   height: 80px;
+  background: #fff;
+
+  align-items: center;
+  justify-content: center;
 
   right: 40px;
   border-radius: 50px;
   border-width: 2px;
   border-color: #64002a;
+`;
+
+export const ImageC = styled.Image`
+  width: 50px;
+  height: 50px;
 `;
 
 export const CardTitle = styled.Text`

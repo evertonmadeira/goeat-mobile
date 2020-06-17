@@ -1,25 +1,17 @@
-import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  Linking,
-  Dimensions,
-  StyleSheet,
-  Alert,
-  TouchableOpacity,
-} from 'react-native';
+import React from 'react';
 import { Container } from './styles';
 
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import { RNCamera } from 'react-native-camera';
-import ModalWebView from '../../components/ModalWebView';
+import { useAuth } from '../../hooks/auth';
 
 const Scan = () => {
-  const onSuccess = (e) => {
-    Linking.openURL(e.data).catch((err) =>
-      Alert.alert('Ocorreu um erro', 'Tente novemente', err),
-    );
-  };
+  const { occupiedTable } = useAuth();
+
+  function onSuccess(e) {
+    const table_id = e.data;
+    occupiedTable(table_id);
+  }
 
   return (
     <Container>

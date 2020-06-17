@@ -2,10 +2,11 @@ import React from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import AuthRoutes from './auth.routes';
 import AppRoutes from './app.routes';
+import CamRoutes from './cam.routes';
 import { useAuth } from '../hooks/auth';
 
 const Routes = () => {
-  const { nome, loading } = useAuth();
+  const { nome, table, loading } = useAuth();
 
   if (loading) {
     return (
@@ -15,7 +16,14 @@ const Routes = () => {
     );
   }
 
-  return nome ? <AppRoutes /> : <AuthRoutes />;
+  if (nome && table) {
+    return <AppRoutes />;
+  }
+  if (nome && !table) {
+    return <CamRoutes />;
+  } else {
+    return <AuthRoutes />;
+  }
 };
 
 export default Routes;

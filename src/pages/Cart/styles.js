@@ -23,7 +23,7 @@ export const Container = styled.View`
 `;
 
 export const Title = styled.Text`
-  font-family: 'Roboto-Regular';
+  font-family: 'Roboto-Medium';
   font-size: 22px;
   color: #fff;
 `;
@@ -31,7 +31,7 @@ export const Title = styled.Text`
 export const CardFooter = styled(Animated.View)`
   background: #fff;
   height: 100%;
-  max-height: 230px;
+  max-height: 235px;
   width: 100%;
 
   align-items: center;
@@ -41,7 +41,7 @@ export const CardFooter = styled(Animated.View)`
   bottom: 0;
   left: 0;
   right: 0;
-  top: 470px;
+  top: 420px;
 `;
 
 export const Minus = styled.View`

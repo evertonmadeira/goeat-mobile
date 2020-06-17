@@ -1,35 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { View } from 'react-native';
 import { Container, Content, Description, Hello, ScanButton } from './styles';
-import Button from '../../components/Button';
 import Icon from 'react-native-vector-icons/Feather';
 import { useNavigation } from '@react-navigation/native';
-import AsyncStorage from '@react-native-community/async-storage';
 import Lottie from 'lottie-react-native';
 import qrScan from '../../assets/qr-code-scan.json';
+import { useAuth } from '../../hooks/auth';
 
 const PreScan = () => {
+  const { nome } = useAuth();
   const navigation = useNavigation();
-  const [data, setData] = useState({});
-
-  useEffect(() => {
-    async function loadName() {
-      // Não entendi muito bem a lógica do getItem nesse trecho
-      const name = await AsyncStorage.getItem('@GoEats:user');
-      // Caso exista o objeto JSON será repassado ao Array de produtos
-      console.log(name);
-      if (name[1]) {
-        setData({ name: JSON.parse(name) });
-      }
-    }
-
-    loadName();
-  }, []);
 
   return (
     <Container>
       <Content>
-        <Hello>Olá, {data.name}! :)</Hello>
+        <Hello>Olá, {nome}!</Hello>
       </Content>
       <Lottie
         source={qrScan}
@@ -40,7 +25,7 @@ const PreScan = () => {
       />
       <View>
         <Description>
-          Para fazer um pedido bastar ler o QR Code que está sobre a mesa.
+          Para fazer um pedido basta ler o QR Code que está sobre a mesa.
         </Description>
       </View>
       <ScanButton onPress={() => navigation.navigate('Scan')}>
