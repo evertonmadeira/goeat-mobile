@@ -1,5 +1,6 @@
 import styled, { css } from 'styled-components/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { TouchableOpacity } from 'react-native';
 
 export const Container = styled.View`
   flex: 1;
@@ -125,4 +126,17 @@ export const StatusText = styled.Text`
       color: #48c936;
     `}
 `;
+
 export const Item = styled.Text``;
+
+export const TookOrder = styled(TouchableOpacity)`
+  width: 100%;
+  max-width: 124px;
+  height: 50px;
+
+  background: #48c936;
+  border-radius: 6px;
+
+  align-items: center;
+  justify-content: center;
+`;

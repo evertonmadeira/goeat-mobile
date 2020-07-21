@@ -23,7 +23,7 @@ import {
   CreateAccountButton,
   CreateAccountButtonText,
 } from './styles';
-import logoImg from '../../assets/logo.png';
+import logoImg from '../../assets/GoEat.png';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
 

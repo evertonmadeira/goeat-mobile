@@ -14,7 +14,7 @@ import { FormHandles } from '@unform/core';
 import Icon from 'react-native-vector-icons/Feather';
 import * as Yup from 'yup';
 import { Container, Title, BackToSignIn, BackToSignInText } from './styles';
-import logoImg from '../../assets/logo.png';
+import logoImg from '../../assets/GoEat.png';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
 import getValidationErrors from '../../utils/getValidationErrors';

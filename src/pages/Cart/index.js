@@ -1,8 +1,9 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect, useCallback } from 'react';
 import { Text, Animated, Alert } from 'react-native';
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
 import { useCart } from '../../hooks/cart';
+import { useAuth } from '../../hooks/auth';
 import formatValue from '../../utils/formatValue';
 import {
   Container,
@@ -32,6 +33,8 @@ import { useNavigation } from '@react-navigation/native';
 
 const Cart = () => {
   const { increment, decrement, products, removeToCart } = useCart();
+  const [orders, setOrders] = useState([]);
+  const [table, setTable] = useState([]);
 
   const navigation = useNavigation();
 
@@ -109,11 +112,11 @@ const Cart = () => {
     }
   };
 
-  const handleSubmitOrder = async () => {
+  const handleSubmitOrder = useCallback(async () => {
     try {
       const data = [...products];
       const status = 'Aberto';
-      const table = await AsyncStorage.getItem('@GoEats:table');
+      const test = [...orders];
 
       const order = data.map((item, i) => {
         return {
@@ -123,20 +126,71 @@ const Cart = () => {
         };
       });
 
-      await api.post('/order', {
+      const response = await api.post('/order', {
         mesa: table,
         status: status,
         pedidos: order,
         total: 0,
       });
 
-      removeToCart();
-      navigation.navigate('Status');
+      if (response.data === 'Pedido aberto') {
+        Alert.alert(
+          'Você possui um pedido aberto ou em produção',
+          'Aguarde concluir para realizar outro',
+        );
+      } else if (response.data === 'Pedido finalizado') {
+        Alert.alert(
+          'Ops!',
+          'Confirme o recebimento do último pedido para realizar outro',
+          [
+            {
+              text: 'Vamos lá!',
+              onPress: () => {
+                navigation.navigate('Status');
+              },
+            },
+          ],
+          { cancelable: false },
+        );
+      } else if (response.data === 'Pedido realizado!') {
+        removeToCart();
+
+        navigation.navigate('Status');
+      }
     } catch (error) {
       console.log(error);
       Alert.alert('Erro ao realizar pedido', 'Tente novamente');
     }
-  };
+  }, [products, orders, navigation, table, removeToCart]);
+
+  useEffect(() => {
+    async function loadTable() {
+      try {
+        const data = await AsyncStorage.getItem('@GoEats:table');
+        setTable(JSON.parse(data));
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    loadTable();
+  }, []);
+
+  useEffect(() => {
+    const getStatus = () => {
+      api
+        .get(`order/${table}`)
+        .then((response) => {
+          console.log(response.data);
+
+          setOrders(response.data);
+        })
+        .catch((error) => {
+          console.log('Algo deu errado ao buscar os pedidos: ' + error);
+        });
+    };
+
+    setInterval(() => getStatus(), 10000);
+  }, [table]);
 
   return (
     <>

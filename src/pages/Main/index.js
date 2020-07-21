@@ -20,7 +20,7 @@ import {
 } from './styles';
 import Icon from 'react-native-vector-icons/Feather';
 import { useNavigation } from '@react-navigation/native';
-import logoImg from '../../assets/logo.png';
+import logoImg from '../../assets/GoEat.png';
 import api from '../../services/api';
 import pastaImg from '../../assets/pasta.jpg';
 import Footer from '../../components/Footer';
@@ -46,18 +46,18 @@ const Main = () => {
     loadTable();
   }, []);
 
-  useEffect(() => {
-    async function loadProductsCategories() {
-      try {
-        const response = await api.get('/category');
+  async function loadProductsCategories() {
+    try {
+      const response = await api.get('/category');
 
-        const productCategory = response.data;
-        setProductsCategories(productCategory);
-      } catch (error) {
-        console.log(error);
-      }
+      const productCategory = response.data;
+      setProductsCategories(productCategory);
+    } catch (error) {
+      console.log(error);
     }
+  }
 
+  useEffect(() => {
     loadProductsCategories();
   }, []);
 

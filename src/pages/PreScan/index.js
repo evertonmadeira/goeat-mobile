@@ -11,10 +11,14 @@ const PreScan = () => {
   const { nome } = useAuth();
   const navigation = useNavigation();
 
+  function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  }
+
   return (
     <Container>
       <Content>
-        <Hello>Olá, {nome}!</Hello>
+        <Hello>Olá, {capitalizeFirstLetter(nome)}!</Hello>
       </Content>
       <Lottie
         source={qrScan}

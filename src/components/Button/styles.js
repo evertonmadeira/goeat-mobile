@@ -1,5 +1,9 @@
-import styled from 'styled-components/native';
+import styled, { css } from 'styled-components/native';
 import { RectButton } from 'react-native-gesture-handler';
+
+const tookOrder = css`
+  background: #48c936;
+`;
 
 export const Container = styled(RectButton)`
   width: 300px;
@@ -8,6 +12,8 @@ export const Container = styled(RectButton)`
   border-radius: 10px;
   justify-content: center;
   align-items: center;
+
+  ${(props) => props.tookOrder && tookOrder}
 `;
 export const ButtonText = styled.Text`
   font-family: 'Roboto-Medium';
