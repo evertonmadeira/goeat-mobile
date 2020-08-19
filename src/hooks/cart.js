@@ -15,9 +15,8 @@ const CartProvider = ({ children }) => {
 
   useEffect(() => {
     async function loadProducts() {
-      // Não entendi muito bem a lógica do getItem nesse trecho
       const cart = await AsyncStorage.getItem('@GoEats:cart');
-      // Caso exista o objeto JSON será repassado aao Array de produtos
+
       if (cart) {
         setProducts(JSON.parse(cart));
       }

@@ -4,13 +4,16 @@ import { Container } from './styles';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import { RNCamera } from 'react-native-camera';
 import { useAuth } from '../../hooks/auth';
+import { AsyncStorage } from 'react-native';
 
 const Scan = () => {
   const { occupiedTable } = useAuth();
 
-  function onSuccess(e) {
+  async function onSuccess(e) {
     const table_id = e.data;
     occupiedTable(table_id);
+
+    await AsyncStorage.setItem('@GoEats:table_id', JSON.stringify(table_id));
   }
 
   return (

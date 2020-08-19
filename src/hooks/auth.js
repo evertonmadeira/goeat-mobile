@@ -62,7 +62,6 @@ const AuthProvider = ({ children }) => {
       const { nome } = data;
       const response = await api.post(`register/${nome}/${table_id}`);
 
-      console.log(response.data);
       const { occupied_table, _id } = response.data;
 
       await AsyncStorage.multiSet([
@@ -105,6 +104,7 @@ const AuthProvider = ({ children }) => {
         loading,
         table: data.table,
         occupiedTable,
+        register: data.register,
       }}
     >
       {children}

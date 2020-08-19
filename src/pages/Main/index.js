@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   FlatList,
   Image,
@@ -12,7 +12,6 @@ import {
   Header,
   ImageC,
   CardTitle,
-  CountOptions,
   ImageContainer,
   CardCategory,
   CardCategoryButton,
@@ -22,62 +21,91 @@ import Icon from 'react-native-vector-icons/Feather';
 import { useNavigation } from '@react-navigation/native';
 import logoImg from '../../assets/GoEat.png';
 import api from '../../services/api';
-import pastaImg from '../../assets/pasta.jpg';
 import Footer from '../../components/Footer';
 import AsyncStorage from '@react-native-community/async-storage';
 import { useAuth } from '../../hooks/auth';
 
 const Main = () => {
   const [productsCategories, setProductsCategories] = useState([]);
-  const [table, setTable] = useState([]);
-  const [count, setCount] = useState([]);
+  const [totalTable, setTotalTable] = useState(0);
+  const [flagToVacancy, setFlagToVacancy] = useState([]);
   const navigation = useNavigation();
-  const { signOut } = useAuth();
+  const { signOut, register, table } = useAuth();
 
   useEffect(() => {
-    async function loadTable() {
+    async function loadProductsCategories() {
       try {
-        const data = await AsyncStorage.getItem('@GoEats:table');
-        setTable(JSON.parse(data));
+        const response = await api.get('/category');
+
+        const productCategory = response.data;
+        setProductsCategories(productCategory);
       } catch (error) {
-        console.log(error);
+        console.log('Erro ao carregar categorias: ' + error);
       }
     }
-    loadTable();
-  }, []);
-
-  async function loadProductsCategories() {
-    try {
-      const response = await api.get('/category');
-
-      const productCategory = response.data;
-      setProductsCategories(productCategory);
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  useEffect(() => {
     loadProductsCategories();
   }, []);
 
-  // useEffect(() => {
-  //   async function loadCount(category) {
-  //     try {
-  //       const response = await api.get(`/product/count/${category}`);
+  useEffect(() => {
+    async function listenFlagToVacancy() {
+      const tableId = await AsyncStorage.getItem('@GoEats:table_id');
+      const convertedTableId = JSON.parse(tableId);
 
-  //       const countItem = response.data;
-  //       setCount(countItem);
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //   }
+      const response = await api.get('table/' + JSON.parse(tableId));
 
-  //   loadCount();
-  // }, []);
+      const { flag_to_vacancy } = response.data;
+
+      setFlagToVacancy(flag_to_vacancy);
+
+      if (flag_to_vacancy === true) {
+        Alert.alert(
+          'Deseja desocupar a mesa?',
+          'Você não possui mais débitos, caso queira permanecer é só pressionar "Ainda não"',
+          [
+            {
+              text: 'Ainda não',
+              onPress: () => editFlagToVacancyToFalse(convertedTableId),
+              style: 'cancel',
+            },
+            {
+              text: 'Sim, por favor',
+              onPress: () => signOut(),
+            },
+          ],
+          { cancelable: false },
+        );
+      }
+    }
+
+    listenFlagToVacancy();
+  }, []);
+
+  useEffect(() => {
+    async function loadTotalTable() {
+      try {
+        const response = await api.get(`/table/total/${table}`);
+
+        const { total } = response.data;
+        setTotalTable(total);
+      } catch (error) {
+        console.log('Erro ao carregar o total da mesa: ' + error);
+      }
+    }
+    setInterval(() => loadTotalTable(), 10000);
+  }, [table]);
 
   function handleNavigateToDishes(categoria) {
     navigation.navigate('Dishes', { categoria: categoria });
+  }
+
+  async function iWannaPay() {
+    try {
+      Alert.alert('Aguarde enquanto algum garçom vem atendê-lo.');
+
+      await api.put(`/register/payment/${register}`);
+    } catch (error) {
+      console.log('Algo deu errado ao tentar fazer o pagamento: ', error);
+    }
   }
 
   function logout() {
@@ -87,7 +115,7 @@ const Main = () => {
       [
         {
           text: 'Cancelar',
-          onPress: () => console.log('Cancel pressed'),
+          onPress: () => console.log('Cancelar'),
           style: 'cancel',
         },
         {
@@ -99,12 +127,48 @@ const Main = () => {
     );
   }
 
+  function needToPay() {
+    Alert.alert(
+      'Deseja pagar?',
+      'Só é possível deslogar após o pagamento da conta.',
+      [
+        {
+          text: 'Agora não',
+          onPress: () => console.log('Agora não'),
+          style: 'cancel',
+        },
+        {
+          text: 'Sim',
+          onPress: () => iWannaPay(),
+        },
+      ],
+      { cancelable: false },
+    );
+  }
+
+  const editFlagToVacancyToFalse = useCallback(
+    async (id) => {
+      const dataTable = {
+        num: table,
+        estado: 'Ocupada',
+        flag_to_vacancy: false,
+      };
+
+      try {
+        await api.post('table/update/' + id, dataTable);
+      } catch (error) {
+        console.log('Erro ao tentar editar a flag para false: ' + error);
+      }
+    },
+    [table],
+  );
+
   return (
     <Content>
       <Header>
         <Image source={logoImg} />
-        <TouchableOpacity onPress={logout}>
-          <Icon name="power" size={24} style={{ color: '#fff' }} />
+        <TouchableOpacity onPress={totalTable > 0 ? needToPay : logout}>
+          <Icon name="log-out" size={24} style={{ color: '#fff' }} />
         </TouchableOpacity>
       </Header>
       <Text style={{ color: '#fff', fontSize: 24, paddingLeft: 50 }}>
@@ -122,7 +186,6 @@ const Main = () => {
             </ImageContainer>
             <CategoryText>
               <CardTitle>{item.nome}</CardTitle>
-              {/* <CountOptions>10 opções</CountOptions> */}
             </CategoryText>
 
             <CardCategoryButton

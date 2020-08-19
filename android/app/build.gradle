@@ -189,6 +189,7 @@ android {
     }
 }
 
+
 dependencies {
     //Multidex para instalar mais métodos
     implementation 'com.android.support:multidex:1.0.3'

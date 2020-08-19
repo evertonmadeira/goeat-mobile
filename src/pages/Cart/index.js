@@ -130,35 +130,16 @@ const Cart = () => {
         mesa: table,
         status: status,
         pedidos: order,
-        total: 0,
+        subtotal: 0,
       });
 
-      if (response.data === 'Pedido aberto') {
-        Alert.alert(
-          'Você possui um pedido aberto ou em produção',
-          'Aguarde concluir para realizar outro',
-        );
-      } else if (response.data === 'Pedido finalizado') {
-        Alert.alert(
-          'Ops!',
-          'Confirme o recebimento do último pedido para realizar outro',
-          [
-            {
-              text: 'Vamos lá!',
-              onPress: () => {
-                navigation.navigate('Status');
-              },
-            },
-          ],
-          { cancelable: false },
-        );
-      } else if (response.data === 'Pedido realizado!') {
+      if (response.data === 'Pedido realizado!') {
         removeToCart();
 
         navigation.navigate('Status');
       }
     } catch (error) {
-      console.log(error);
+      console.log('Erro: ' + error);
       Alert.alert('Erro ao realizar pedido', 'Tente novamente');
     }
   }, [products, orders, navigation, table, removeToCart]);
@@ -180,8 +161,6 @@ const Cart = () => {
       api
         .get(`order/${table}`)
         .then((response) => {
-          console.log(response.data);
-
           setOrders(response.data);
         })
         .catch((error) => {
@@ -189,7 +168,7 @@ const Cart = () => {
         });
     };
 
-    setInterval(() => getStatus(), 10000);
+    // setInterval(() => getStatus(), 100000);
   }, [table]);
 
   return (
